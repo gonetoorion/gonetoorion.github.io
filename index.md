@@ -1,4 +1,4 @@
-### ubuntu 19.10 recovery模式下连接无线网络(加密类型wap1)
+### ubuntu 19.10 recovery模式下连接WIFI(加密类型wap1)
 
 ##### 一. 进入root shell
     1. 进入recovery菜单
