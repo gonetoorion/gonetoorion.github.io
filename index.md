@@ -1,123 +1,23 @@
----
-layout: default
----
+### ubuntu 19.10 recovery模式下连接无线网络(加密类型wap1)
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+##### 一. 进入root shell
+    1. 进入recovery菜单
+    2. 选择network Enable networking
+    3. 选择root Drop to root shell prompt
+    4. 输入用名密码登录系统
 
-[Link to another page](./another-page.html).
-
-There should be whitespace between paragraphs.
-
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
-
-# Header 1
-
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
-
-## Header 2
-
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
-
-### Header 3
-
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
-
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
-
-#### Header 4
-
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-
-##### Header 5
-
-1.  This is an ordered list following a header.
-2.  This is an ordered list following a header.
-3.  This is an ordered list following a header.
-
-###### Header 6
-
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
-
-### There's a horizontal rule below this.
-
-* * *
-
-### Here is an unordered list:
-
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-### And an ordered list:
-
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
-### Small image
-
-![Octocat](https://github.githubassets.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![Branching](https://guides.github.com/activities/hello-world/branching.png)
-
-
-### Definition lists can be used with HTML syntax.
-
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
-```
-
-```
-The final element.
-```
+##### 二. 连接
+    1. 运行iwconfig　命令确认无线网卡是哪个(以下以wlan0为例)
+    2. 运行ip link set wlan0 up 启动无线网卡
+    3. 运行iw dev wlan0 scan|grep SSID 扫描附近的无线网络，注意SSID并记住(以下SSID以wireless111为例)
+    4. 查看这个文件是否存在/etc/wpa_supplicant/wpa_supplicant.conf，如果不存在则运行echo "ctrl_interface=/var/run/wpa_supplicant">/etc/wpa_supplicant/wpa_supplicant.conf
+    5.运行  wpa_supplicant -Dwext -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf& 如果出错，请运行ps aux|grep wpa命令来确认是否有这样的进程早已启动，如果启动了可以运行killall wpa_supplicant命令结束该进程，并再次运行wpa_supplicant -Dwext -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf&
+    6. 运行wpa_cli -i wlan0
+          1. 运行add_network　正常返回数字比如0 (以下均已0为例)
+          2. 运行set_network 0 ssid "wlan0" 成功返回ok
+          3. 运行set_network 0 psk "密码" 成功返回ok
+          4. 运行enable_network 0
+          5. 输入q, enter键退出wap_cli
+    7. 运行dhclient wlan0　分配ip (dhclient -r可以释放)
+    8. 运行ifconfig 查看wlan0是否分配了ip
+    9. ping 一个域名来看看网络是否连上了，ping不通则需要看看/etc/resolv.conf文件中的DNS配置，可以设置成8.8.8.8保存退出后，再ping下试试
